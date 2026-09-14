@@ -1,0 +1,188 @@
+
+<div class="tree-intro">
+  <div class="tree-title">Structure du projet ROS 2</div>
+  <div class="tree-subtitle">TurtleBot3 · vision stéréo PSMNet · navigation autonome PPO</div>
+  <p>Cette vue permet de repérer rapidement les différentes parties du projet et leur rôle. Les éléments développés pour le projet sont distingués des packages officiels de TurtleBot3.</p>
+</div>
+
+<style>
+.tree-intro{font-family:var(--font-sans);margin:0 0 12px;padding:14px 18px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);}
+.tree-title{font-size:16px;font-weight:650;color:var(--color-text-primary);margin-bottom:3px;}
+.tree-subtitle{font-size:12px;color:var(--color-text-secondary);margin-bottom:7px;}
+.tree-intro p{font-size:12px;line-height:1.5;color:var(--color-text-secondary);margin:0;max-width:850px;}
+.tree-wrap{font-family:var(--font-mono);font-size:12px;line-height:1.85;padding:16px 20px;background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);overflow-x:auto;}
+.row{display:flex;align-items:center;gap:0;white-space:nowrap;cursor:pointer;border-radius:4px;padding:0 4px;transition:background .1s;}
+.row:hover{background:var(--color-border-tertiary);}
+.indent{color:var(--color-text-tertiary);user-select:none;}
+.icon{font-size:13px;margin-right:5px;flex-shrink:0;}
+.name{font-weight:500;}
+.desc{font-weight:400;font-size:11px;color:var(--color-text-secondary);margin-left:12px;white-space:nowrap;}
+.badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;margin-left:6px;vertical-align:middle;white-space:nowrap;}
+/* Colors by type */
+.t-ws   .name{color:#60A5FA;}
+.t-pkg  .name{color:#818CF8;}
+.t-mod  .name{color:#34D399;}
+.t-node .name{color:#34D399;}
+.t-launch .name{color:#FB923C;}
+.t-yaml .name{color:#FACC15;}
+.t-urdf .name{color:#F472B6;}
+.t-world .name{color:#A78BFA;}
+.t-msg  .name{color:#38BDF8;}
+.t-model .name{color:#F59E0B;}
+.t-gen  .name{color:var(--color-text-tertiary);}
+.t-dir  .name{color:#60A5FA;}
+/* Badge fills */
+.b-new{background:#E1F5EE;color:#085041;}
+.b-upstream{background:#E6F1FB;color:#0C447C;}
+.b-gen{background:var(--color-background-secondary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-secondary);}
+/* Legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;padding:8px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary);}
+.leg-dot{width:8px;height:8px;border-radius:2px;}
+/* Tooltip */
+.tooltip{position:fixed;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:11px;color:var(--color-text-secondary);font-family:var(--font-sans);max-width:260px;line-height:1.5;z-index:999;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:none;}
+</style>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#818CF8"></div>Package ROS 2</div>
+  <div class="leg"><div class="leg-dot" style="background:#34D399"></div>Node Python</div>
+  <div class="leg"><div class="leg-dot" style="background:#FB923C"></div>Fichier de lancement</div>
+  <div class="leg"><div class="leg-dot" style="background:#FACC15"></div>Configuration YAML</div>
+  <div class="leg"><div class="leg-dot" style="background:#F472B6"></div>URDF / Xacro</div>
+  <div class="leg"><div class="leg-dot" style="background:#A78BFA"></div>Monde Gazebo</div>
+  <div class="leg"><div class="leg-dot" style="background:#38BDF8"></div>Message / Service</div>
+  <div class="leg"><div class="leg-dot" style="background:#F59E0B"></div>Modèle entraîné</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--color-text-tertiary)"></div>Généré par colcon</div>
+</div>
+
+<div class="tree-wrap" id="tree"></div>
+<div class="tooltip" id="tip"></div>
+
+<script>
+const tree = [
+  {t:"ws",   n:"ros2_ws/",        d:"Workspace principal du projet, sous ROS 2 Humble et Ubuntu 22.04"},
+  {t:"gen",  n:"build/",          d:"Dossier généré automatiquement par colcon", i:"🔧", indent:1},
+  {t:"gen",  n:"install/",        d:"Fichiers installés par le workspace", i:"📦", indent:1},
+  {t:"gen",  n:"log/",            d:"Journaux et traces de compilation", i:"📋", indent:1},
+  {t:"dir",  n:"src/",            d:"Code source des packages ROS 2", i:"📂", indent:1},
+
+  // ── stereo_vision ────────────────────────────────────────────────
+  {t:"pkg",  n:"stereo_vision/",  d:"Perception stéréo : profondeur, disparité et détection d’obstacles", badge:"new", i:"📦", indent:2},
+  {t:"mod",  n:"stereo_vision/",  d:"Code Python principal du package", i:"🐍", indent:3},
+  {t:"node", n:"__init__.py",     d:"Initialisation du package Python", i:"·", indent:4},
+  {t:"node", n:"psmnet_node.py",  d:"Exécute PSMNet et publie la profondeur et la disparité", i:"🔵", indent:4},
+  {t:"node", n:"obstacle_detector.py", d:"Détecte le sol et regroupe les obstacles avec RANSAC et DBSCAN", i:"🔵", indent:4},
+  {t:"node", n:"stereo_proc_node.py",  d:"Rectifie les images gauche et droite avant l’inférence", i:"🔵", indent:4},
+  {t:"dir",  n:"models/",         d:"Architecture du modèle PSMNet en PyTorch", i:"📂", indent:3},
+  {t:"node", n:"psmnet.py",       d:"Construction du réseau : SPP, cost volume, convolutions 3D et softargmax", i:"🧠", indent:4},
+  {t:"dir",  n:"checkpoints/",    d:"Modèles PSMNet entraînés et sauvegardés", i:"📂", indent:3},
+  {t:"model",n:"psmnet_best.pth", d:"Meilleur modèle obtenu après le fine-tuning sur TartanGround", i:"⭐", indent:4},
+  {t:"model",n:"psmnet_ep300.pth",d:"Sauvegarde du modèle après 300 époques", i:"💾", indent:4},
+  {t:"dir",  n:"config/",         d:"Paramètres utilisés par la perception stéréo", i:"📂", indent:3},
+  {t:"yaml", n:"stereo_params.yaml", d:"focal=462.1px, baseline=0.12m, maxdisp=192, depth_min=0.3m, depth_max=10.0m", i:"⚙️", indent:4},
+  {t:"dir",  n:"launch/",         d:"Scripts qui démarrent les différents nœuds de perception", i:"📂", indent:3},
+  {t:"launch",n:"stereo_perception.launch.py", d:"Démarre toute la chaîne de perception stéréo", i:"🚀", indent:4},
+  {t:"launch",n:"full_system.launch.py", d:"Démarre la simulation complète, de Gazebo à la navigation", i:"🚀", indent:4},
+  {t:"dir",  n:"rviz/",           d:"Configuration de l’affichage dans RViz2", i:"📂", indent:3},
+  {t:"yaml", n:"stereo_nav.rviz", d:"Affiche les images rectifiées, la disparité, les obstacles et les TF", i:"👁️", indent:4},
+  {t:"node", n:"setup.py",        d:"Déclare les exécutables Python utilisés par ROS 2", i:"📄", indent:3},
+  {t:"node", n:"package.xml",     d:"Dépendances : rclpy, cv_bridge, sensor_msgs, stereo_msgs, nav_msgs", i:"📄", indent:3},
+  {t:"node", n:"resource/stereo_vision", d:"Fichier utilisé par ament pour identifier le package", i:"·", indent:3},
+
+  // ── rl_navigation ────────────────────────────────────────────────
+  {t:"pkg",  n:"rl_navigation/",  d:"Navigation autonome par apprentissage par renforcement", badge:"new", i:"📦", indent:2},
+  {t:"mod",  n:"rl_navigation/",  d:"Code Python principal du package", i:"🐍", indent:3},
+  {t:"node", n:"__init__.py",     d:"Initialisation du package Python", i:"·", indent:4},
+  {t:"node", n:"rl_agent_node.py",d:"Node ROS2 — Utilise la politique PPO pour commander le robot à partir de la profondeur, de l’odométrie et de la cible", i:"🔵", indent:4},
+  {t:"node", n:"gym_env.py",      d:"Fait le lien entre Gymnasium et ROS 2 pour l’entraînement de l’agent", i:"🏋️", indent:4},
+  {t:"node", n:"reward_node.py",  d:"Calcule les récompenses selon l’objectif, les collisions et la proximité des obstacles", i:"🔵", indent:4},
+  {t:"node", n:"goal_manager.py", d:"Crée et suit les objectifs de navigation", i:"🔵", indent:4},
+  {t:"node", n:"train_ppo.py",    d:"Entraîne l’agent PPO avec Stable-Baselines3 et un curriculum de 500k étapes", i:"🎯", indent:4},
+  {t:"dir",  n:"models/",         d:"Politiques PPO déjà entraînées", i:"📂", indent:3},
+  {t:"model",n:"ppo_best.zip",    d:"Politique ayant obtenu le meilleur taux de réussite", i:"⭐", indent:4},
+  {t:"model",n:"ppo_final.zip",   d:"Dernière politique sauvegardée après 500k étapes", i:"💾", indent:4},
+  {t:"dir",  n:"config/",         d:"Paramètres utilisés pendant l’entraînement PPO", i:"📂", indent:3},
+  {t:"yaml", n:"ppo_params.yaml", d:"lr=3e-4, gamma=0.99, n_steps=2048, batch=64, clip=0.2, ent_coef=0.01", i:"⚙️", indent:4},
+  {t:"dir",  n:"launch/",         d:"Scripts de démarrage du système RL", i:"📂", indent:3},
+  {t:"launch",n:"train.launch.py",d:"Démarre la simulation et l’entraînement PPO", i:"🚀", indent:4},
+  {t:"launch",n:"deploy.launch.py",d:"Démarre le système complet pour tester la politique entraînée", i:"🚀", indent:4},
+  {t:"node", n:"setup.py",        d:"Point d'entrée colcon", i:"📄", indent:3},
+  {t:"node", n:"package.xml",     d:"Dépendances : rclpy, stable_baselines3, gymnasium, geometry_msgs", i:"📄", indent:3},
+
+  // ── turtlebot3_stereo ────────────────────────────────────────────
+  {t:"pkg",  n:"turtlebot3_stereo/", d:"Modèle TurtleBot3 Waffle équipé d’une caméra stéréo", badge:"new", i:"📦", indent:2},
+  {t:"dir",  n:"urdf/",           d:"Description du robot et de ses capteurs", i:"📂", indent:3},
+  {t:"urdf", n:"tb3_waffle_stereo.urdf.xacro", d:"Ajoute la seconde caméra et définit une baseline de 0.12 m", i:"🤖", indent:4},
+  {t:"urdf", n:"stereo_camera_macro.xacro", d:"Macro réutilisable pour créer une caméra stéréo dans Gazebo", i:"📷", indent:4},
+  {t:"dir",  n:"meshes/",         d:"Modèles 3D utilisés par le TurtleBot3", i:"📂", indent:3},
+  {t:"dir",  n:"worlds/",         d:"Scènes Gazebo utilisées pour évaluer la navigation", i:"📂", indent:3},
+  {t:"world",n:"corridor.world",  d:"Scénario A : couloir avec obstacles fixes et trajectoires de test", i:"🏗️", indent:4},
+  {t:"world",n:"open_space.world",d:"Scénario B : espace ouvert avec obstacles fixes et un obstacle mobile", i:"🏗️", indent:4},
+  {t:"world",n:"warehouse.world", d:"Scénario C : entrepôt avec étagères, allées et obstacles variés", i:"🏗️", indent:4},
+  {t:"dir",  n:"launch/",         d:"Scripts de démarrage du système RL robot", i:"📂", indent:3},
+  {t:"launch",n:"spawn_robot.launch.py", d:"Insère le TurtleBot3 dans Gazebo et publie son état", i:"🚀", indent:4},
+  {t:"launch",n:"bringup.launch.py", d:"Met en place les transformations TF2 du robot et des caméras", i:"🚀", indent:4},
+  {t:"dir",  n:"config/",         d:"Paramètres de calibration de la caméra stéréo", i:"📂", indent:3},
+  {t:"yaml", n:"camera_calibration.yaml", d:"Matrices de calibration et paramètres extrinsèques des deux caméras", i:"⚙️", indent:4},
+  {t:"node", n:"setup.py",        d:"Point d'entrée colcon", i:"📄", indent:3},
+  {t:"node", n:"package.xml",     d:"Dépendances : rclpy, gazebo_ros, turtlebot3_msgs", i:"📄", indent:3},
+
+  // ── stereo_msgs_custom ───────────────────────────────────────────
+  {t:"pkg",  n:"stereo_msgs_custom/", d:"Messages et services spécifiques au projet", badge:"new", i:"📦", indent:2},
+  {t:"dir",  n:"msg/",            d:"Types de messages personnalisés", i:"📂", indent:3},
+  {t:"msg",  n:"ObstacleBBox.msg",d:"Décrit un obstacle avec sa position, ses dimensions, sa distance et sa confiance", i:"📨", indent:4},
+  {t:"msg",  n:"ObstacleArray.msg", d:"header + ObstacleBBox[] obstacles — tableau d'obstacles", i:"📨", indent:4},
+  {t:"dir",  n:"srv/",            d:"Services utilisés pour piloter certaines actions", i:"📂", indent:3},
+  {t:"msg",  n:"ResetGoal.srv",   d:"Request: seed(int) → Response: goal_pose(PoseStamped) — reset d'objectif", i:"🔧", indent:4},
+  {t:"node", n:"CMakeLists.txt",  d:"Génère les interfaces ROS 2 personnalisées", i:"📄", indent:3},
+  {t:"node", n:"package.xml",     d:"Dépendances : rclpy, rosidl_default_generators, geometry_msgs", i:"📄", indent:3},
+
+  // ── Upstream packages ────────────────────────────────────────────
+  {t:"pkg",  n:"turtlebot3/",     d:"Packages officiels TurtleBot3 fournis par ROBOTIS", badge:"upstream", i:"📦", indent:2},
+  {t:"pkg",  n:"turtlebot3_msgs/",d:"Messages officiels du TurtleBot3", badge:"upstream", i:"📦", indent:2},
+  {t:"pkg",  n:"turtlebot3_simulations/", d:"Simulation et modèles de base fournis par ROBOTIS", badge:"upstream", i:"📦", indent:2},
+  {t:"pkg",  n:"DynamixelSDK/",   d:"SDK officiel pour les moteurs Dynamixel", badge:"upstream", i:"📦", indent:2},
+];
+
+const tip = document.getElementById('tip');
+
+function buildTree() {
+  const wrap = document.getElementById('tree');
+  const frags = tree.map(item => {
+    const indent = item.indent || 0;
+    const pipes = [];
+    for (let i = 0; i < indent; i++) {
+      pipes.push(i === indent - 1 ? '├── ' : '│   ');
+    }
+    const badgeHtml = item.badge === 'new'
+      ? '<span class="badge b-new">projet</span>'
+      : item.badge === 'upstream'
+      ? '<span class="badge b-upstream">officiel</span>'
+      : '';
+
+    return `<div class="row t-${item.t}"
+      data-desc="${(item.d||'').replace(/"/g,'&quot;')}"
+      onmouseenter="showTip(event,this)"
+      onmouseleave="hideTip()">
+      <span class="indent">${pipes.join('')}</span>
+      <span class="icon">${item.i||''}</span>
+      <span class="name">${item.n}</span>
+      ${badgeHtml}
+    </div>`;
+  });
+  wrap.innerHTML = frags.join('');
+}
+
+function showTip(e, el) {
+  const desc = el.dataset.desc;
+  if (!desc) return;
+  tip.textContent = desc;
+  tip.style.opacity = '1';
+  const r = el.getBoundingClientRect();
+  tip.style.left = Math.min(e.clientX + 12, window.innerWidth - 280) + 'px';
+  tip.style.top  = (r.bottom + 4) + 'px';
+}
+function hideTip() { tip.style.opacity = '0'; }
+
+buildTree();
+</script>
